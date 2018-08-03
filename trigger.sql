@@ -1,13 +1,3 @@
-CREATE OR REPLACE TRIGGER STUDENT4.CUSTOMERS_ID_TRG
-before insert ON STUDENT4.CUSTOMERS
-for each row
-DISABLE
-begin
-  if :new.ID_CUSTOMER is null then
-    select CUSTOMERS_seq.nextval into :new.ID_CUSTOMER from dual;
-  end if;
-end;
-/
 CREATE OR REPLACE TRIGGER STUDENT4.ORDERS_ID_TRG
 before insert ON STUDENT4.ORDERS
 for each row
@@ -77,6 +67,24 @@ for each row
 begin
   if :new.ID_WAREHOUSE is null then
     select WAREHOUSES_seq.nextval into :new.ID_WAREHOUSE from dual;
+  end if;
+end;
+/
+CREATE OR REPLACE TRIGGER STUDENT4.LOGES_ID_TRG
+before insert ON "STUDENT4"."LOGS"
+for each row
+begin
+  if :new.ID_LINE is null then
+    select LOGES_SEQ.nextval into :new.ID_LINE from dual;
+  end if;
+end;
+/
+CREATE OR REPLACE TRIGGER STUDENT4.LOGES_ID_TRG_2
+before insert ON "STUDENT4"."LOGS"
+for each row
+begin
+  if :new.ID_LINE is null then
+    select LOGES_SEQ.nextval into :new.ID_LINE from dual;
   end if;
 end;
 /

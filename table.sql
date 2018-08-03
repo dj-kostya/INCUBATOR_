@@ -183,18 +183,6 @@ STORAGE    (
            )
 /
 
-CREATE OR REPLACE TRIGGER STUDENT4.CUSTOMERS_ID_TRG
-before insert ON STUDENT4.CUSTOMERS
-for each row
-DISABLE
-begin
-  if :new.ID_CUSTOMER is null then
-    select CUSTOMERS_seq.nextval into :new.ID_CUSTOMER from dual;
-  end if;
-end;
-/
-
-
 ALTER TABLE STUDENT4.CUSTOMERS ADD (
   CONSTRAINT CUSTOMERS_PK
   PRIMARY KEY
@@ -277,6 +265,79 @@ ALTER TABLE STUDENT4.DELIVERY ADD (
   CONSTRAINT DELIVERY_FK_1 
   FOREIGN KEY (ID_ORDER) 
   REFERENCES STUDENT4.ORDERS (ID_ORDER)
+  ENABLE VALIDATE)
+/
+CREATE TABLE STUDENT4.LOGS
+(
+  ID_LOG        NUMBER,
+  FUNCTION_ERR  VARCHAR2(200 CHAR),
+  TEXT_ERR      VARCHAR2(500 CHAR),
+  DATE_ERR      DATE                            DEFAULT SYSDATE
+)
+TABLESPACE USERS
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+MONITORING
+/
+
+
+CREATE UNIQUE INDEX STUDENT4.LOGES_PK ON STUDENT4.LOGS
+(ID_LOG)
+LOGGING
+TABLESPACE USERS
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+/
+
+CREATE OR REPLACE TRIGGER STUDENT4.LOGES_ID_TRG
+before insert ON "STUDENT4"."LOGS"
+for each row
+begin
+  if :new.ID_LINE is null then
+    select LOGES_SEQ.nextval into :new.ID_LINE from dual;
+  end if;
+end;
+/
+
+
+CREATE OR REPLACE TRIGGER STUDENT4.LOGES_ID_TRG_2
+before insert ON "STUDENT4"."LOGS"
+for each row
+begin
+  if :new.ID_LINE is null then
+    select LOGES_SEQ.nextval into :new.ID_LINE from dual;
+  end if;
+end;
+/
+
+
+ALTER TABLE STUDENT4.LOGS ADD (
+  CONSTRAINT LOGES_PK
+  PRIMARY KEY
+  (ID_LOG)
+  USING INDEX STUDENT4.LOGES_PK
   ENABLE VALIDATE)
 /
 CREATE TABLE STUDENT4.ORDERS

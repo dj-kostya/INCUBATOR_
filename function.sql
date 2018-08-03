@@ -17,6 +17,37 @@ BEGIN
   return;
 END ;
 /
+CREATE OR REPLACE FUNCTION STUDENT4.get_quantity_3_4_2_PIPE
+(
+p_quantity number
+) return t_quantity_table pipelined
+ IS
+v_rec t_quantity_record;
+
+BEGIN
+   for i in( select id_warehouse,id_thing, quantity from Remnants where quantity < p_quantity and del_date is null)
+   loop
+    v_rec:=t_quantity_record(i.id_warehouse,i.id_thing,i.quantity);
+    pipe row(v_rec);
+   end loop;
+   return ;
+END ;
+/
+CREATE OR REPLACE FUNCTION STUDENT4.GET_THING_3_1_1_PIPE
+
+ return t_THING_table pipelined
+ AS
+v_rec t_THING_record;
+
+BEGIN
+   for i in(select id_thing, NAME_THING,PRICE_THING from THINGS where DEL_DATE is null)
+   loop
+    v_rec:=t_THING_record(i.NAME_THING,i.id_thing,i.PRICE_THING);
+    pipe row(v_rec);
+   end loop;
+   return ;
+END ;
+/
 CREATE OR REPLACE FUNCTION STUDENT4."ADD_THING_3_1_2_FUNC" 
 (  
 p_NAME IN VARCHAR2, 
@@ -44,6 +75,24 @@ return 1;
 
 end;
 END ;
+/
+CREATE OR REPLACE FUNCTION STUDENT4."GET_THING_3_1_1_FUNC" 
+(
+ p_message out varchar2,
+ p_status out number
+)return SYS_REFCURSOR
+is 
+v_return  SYS_REFCURSOR;
+BEGIN
+OPEN v_return FOR
+select NAME_THING,PRICE_THING from THINGS where DEL_DATE is null;
+p_status:=0;
+p_message:='ВСЕ ГУД';
+return v_return;
+exception 
+when NO_DATA_FOUND then p_status:=1; p_message:='Все товары удалены'; return null;
+when others then p_status:=2; p_message:='Все сломалось сори ('; return null;
+END;
 /
 CREATE OR REPLACE FUNCTION STUDENT4."EDIT_THING_3_1_3_FUNC" (
     p_ID          IN     NUMBER,
@@ -104,52 +153,45 @@ BEGIN
    return;
 END ;
 /
-CREATE OR REPLACE FUNCTION STUDENT4.get_quantity_3_4_2_PIPE
-(
-p_quantity number
-) return t_quantity_table pipelined
- IS
-v_rec t_quantity_record;
+CREATE OR REPLACE FUNCTION STUDENT4.predict_3_5_func (
+    p_id_user        NUMBER,
+    p_id_thing       NUMBER,
+    p_id_order       NUMBER,
+    p_status     OUT NUMBER,
+    p_message    OUT VARCHAR2)
+    RETURN SYS_REFCURSOR
+IS
+    v_return_curs   SYS_REFCURSOR;
+BEGIN
+    OPEN v_return_curs FOR
+        SELECT c.id_thing, t.NAME_THING, t.PRICE_thing
+          FROM student4.Carts c JOIN student4.things t ON t.ID_THING = c.ID_THING
+         WHERE     c.id_order IN
+                       (SELECT c.id_order
+                          FROM student4.carts  c
+                               JOIN student4.orders o ON o.ID_ORDER = c.ID_ORDER
+                         WHERE     c.id_thing = p_id_thing
+                               AND c.id_order <> p_id_order
+                               AND c.del_date IS NULL
+                               AND o.ID_USER <> p_id_user)
+               AND c.id_thing <> p_id_thing
+               AND c.del_date IS NULL
+               AND t.del_date IS NULL;
 
-BEGIN
-   for i in( select id_warehouse,id_thing, quantity from Remnants where quantity < p_quantity and del_date is null)
-   loop
-    v_rec:=t_quantity_record(i.id_warehouse,i.id_thing,i.quantity);
-    pipe row(v_rec);
-   end loop;
-   return ;
-END ;
-/
-CREATE OR REPLACE FUNCTION STUDENT4."GET_THING_3_1_1_FUNC" 
-(
- p_message out varchar2,
- p_status out number
-)return SYS_REFCURSOR
-is 
-v_return  SYS_REFCURSOR;
-BEGIN
-OPEN v_return FOR
-select NAME_THING,PRICE_THING from THINGS where DEL_DATE is null;
-p_status:=0;
-p_message:='ВСЕ ГУД';
-return v_return;
-exception 
-when NO_DATA_FOUND then p_status:=1; p_message:='Все товары удалены'; return null;
-when others then p_status:=2; p_message:='Все сломалось сори ('; return null;
+    p_message := 'ВСЕ ГУД';
+    p_status := 0;
+    RETURN v_return_curs;
+    EXCEPTION
+        WHEN OTHERS
+        THEN
+            p_message :=
+                   'Все сломалось сорри ( : '
+                || TO_CHAR (SQLCODE)
+                || ' - '
+                || SQLERRM;
+            p_status:=1;
+            STUDENT4.add_logs  (P_FUNCTION   => 'STUDENT4.predict_3_5_func',
+                      P_TEXT_ERR   => TO_CHAR (SQLCODE) || ' - ' || SQLERRM);
+            RETURN null;
 END;
-/
-CREATE OR REPLACE FUNCTION STUDENT4.GET_THING_3_1_1_PIPE
-
- return t_THING_table pipelined
- AS
-v_rec t_THING_record;
-
-BEGIN
-   for i in(select id_thing, NAME_THING,PRICE_THING from THINGS where DEL_DATE is null)
-   loop
-    v_rec:=t_THING_record(i.NAME_THING,i.id_thing,i.PRICE_THING);
-    pipe row(v_rec);
-   end loop;
-   return ;
-END ;
 /
