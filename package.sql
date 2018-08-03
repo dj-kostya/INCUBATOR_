@@ -1,3 +1,39 @@
+CREATE OR REPLACE PACKAGE STUDENT4.Reports_3_4
+AS
+    FUNCTION GET_delivery_3_4_1_pipe (p_status    OUT NUMBER,
+                                      p_message   OUT VARCHAR2)
+        RETURN t_delivery_table
+        PIPELINED;
+
+
+    FUNCTION GET_delivery_3_4_1 (p_status OUT NUMBER, p_message OUT VARCHAR2)
+        RETURN SYS_REFCURSOR;
+
+    FUNCTION GET_delivery_3_4_1_JSON (p_status    OUT NUMBER,
+                                      p_message   OUT VARCHAR2)
+        RETURN CLOB;
+
+    /***************************************************************************
+
+    ***************************************************************************/
+
+    FUNCTION get_quantity_3_4_2_PIPE (p_quantity       NUMBER,
+                                      p_status     OUT NUMBER,
+                                      p_message    OUT VARCHAR2)
+        RETURN t_quantity_table
+        PIPELINED;
+
+    FUNCTION get_quantity_3_4_2_JSON (p_quantity       NUMBER,
+                                      p_status     OUT NUMBER,
+                                      p_message    OUT VARCHAR2)
+        RETURN CLOB;
+
+    FUNCTION get_quantity_3_4_2 (p_quantity       NUMBER,
+                                 p_status     OUT NUMBER,
+                                 p_message    OUT VARCHAR2)
+        RETURN SYS_REFCURSOR;
+END Reports_3_4;
+/
 CREATE OR REPLACE PACKAGE STUDENT4.THING_3_1
 IS
     FUNCTION "GET_THING_3_1_1" (p_message OUT VARCHAR2, p_status OUT NUMBER)
@@ -116,40 +152,4 @@ AS
                                                                        )
         RETURN NUMBER;    
 END WAREHOUSE_3_3;
-/
-CREATE OR REPLACE PACKAGE STUDENT4.Reports_3_4
-AS
-    FUNCTION GET_delivery_3_4_1_pipe (p_status    OUT NUMBER,
-                                      p_message   OUT VARCHAR2)
-        RETURN t_delivery_table
-        PIPELINED;
-
-
-    FUNCTION GET_delivery_3_4_1 (p_status OUT NUMBER, p_message OUT VARCHAR2)
-        RETURN SYS_REFCURSOR;
-
-    FUNCTION GET_delivery_3_4_1_JSON (p_status    OUT NUMBER,
-                                      p_message   OUT VARCHAR2)
-        RETURN CLOB;
-
-    /***************************************************************************
-
-    ***************************************************************************/
-
-    FUNCTION get_quantity_3_4_2_PIPE (p_quantity       NUMBER,
-                                      p_status     OUT NUMBER,
-                                      p_message    OUT VARCHAR2)
-        RETURN t_quantity_table
-        PIPELINED;
-
-    FUNCTION get_quantity_3_4_2_JSON (p_quantity       NUMBER,
-                                      p_status     OUT NUMBER,
-                                      p_message    OUT VARCHAR2)
-        RETURN CLOB;
-
-    FUNCTION get_quantity_3_4_2 (p_quantity       NUMBER,
-                                 p_status     OUT NUMBER,
-                                 p_message    OUT VARCHAR2)
-        RETURN SYS_REFCURSOR;
-END Reports_3_4;
 /
