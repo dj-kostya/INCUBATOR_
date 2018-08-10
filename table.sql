@@ -27,7 +27,7 @@ MONITORING
 /
 
 
---  There is no statement for index STUDENT4.SYS_C0082781.
+--  There is no statement for index STUDENT4.SYS_C0084010.
 --  The object is created when the parent object is created.
 
 CREATE OR REPLACE TRIGGER STUDENT4.CARTS_ID_TRG
@@ -116,6 +116,23 @@ STORAGE    (
            )
 /
 
+CREATE UNIQUE INDEX STUDENT4.CITY_U ON STUDENT4.CITY
+(NAME_CITY)
+LOGGING
+TABLESPACE USERS
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+/
+
 CREATE OR REPLACE TRIGGER STUDENT4.CITY_ID_TRG
 before insert ON STUDENT4.CITY
 for each row
@@ -132,13 +149,17 @@ ALTER TABLE STUDENT4.CITY ADD (
   PRIMARY KEY
   (ID_CITY)
   USING INDEX STUDENT4.CITY_PK
+  ENABLE VALIDATE,
+  CONSTRAINT CITY_U
+  UNIQUE (NAME_CITY)
+  USING INDEX STUDENT4.CITY_U
   ENABLE VALIDATE)
 /
 CREATE TABLE STUDENT4.CUSTOMERS
 (
   ID_USER              NUMBER                   NOT NULL,
-  ADRESS_CUSTOMER      VARCHAR2(60 BYTE)        NOT NULL,
-  TELEFON_CUSTOMER     VARCHAR2(60 BYTE)        NOT NULL,
+  ADRESS_CUSTOMER      VARCHAR2(60 BYTE),
+  TELEFON_CUSTOMER     VARCHAR2(60 BYTE),
   SURNAME_CUSTOMER     VARCHAR2(200 CHAR),
   NAME_CUSTOMER        VARCHAR2(200 CHAR),
   PATRONYMIC_CUSTOMER  VARCHAR2(200 CHAR),
@@ -228,7 +249,7 @@ MONITORING
 /
 
 
---  There is no statement for index STUDENT4.SYS_C0082782.
+--  There is no statement for index STUDENT4.SYS_C0084018.
 --  The object is created when the parent object is created.
 
 CREATE OR REPLACE TRIGGER STUDENT4.DELIVERY_ID_TRG
@@ -315,19 +336,8 @@ CREATE OR REPLACE TRIGGER STUDENT4.LOGES_ID_TRG
 before insert ON "STUDENT4"."LOGS"
 for each row
 begin
-  if :new.ID_LINE is null then
-    select LOGES_SEQ.nextval into :new.ID_LINE from dual;
-  end if;
-end;
-/
-
-
-CREATE OR REPLACE TRIGGER STUDENT4.LOGES_ID_TRG_2
-before insert ON "STUDENT4"."LOGS"
-for each row
-begin
-  if :new.ID_LINE is null then
-    select LOGES_SEQ.nextval into :new.ID_LINE from dual;
+  if :new.ID_LOG is null then
+    select LOGES_SEQ.nextval into :new.ID_LOG from dual;
   end if;
 end;
 /
@@ -339,6 +349,15 @@ ALTER TABLE STUDENT4.LOGS ADD (
   (ID_LOG)
   USING INDEX STUDENT4.LOGES_PK
   ENABLE VALIDATE)
+/
+
+GRANT ALTER, DELETE, INDEX, INSERT, REFERENCES, SELECT, UPDATE, ON COMMIT REFRESH, QUERY REWRITE, READ, DEBUG, FLASHBACK ON STUDENT4.LOGS TO STUDENT1
+/
+
+GRANT ALTER, DELETE, INDEX, INSERT, REFERENCES, SELECT, UPDATE, ON COMMIT REFRESH, QUERY REWRITE, READ, DEBUG, FLASHBACK ON STUDENT4.LOGS TO STUDENT2
+/
+
+GRANT ALTER, DELETE, INDEX, INSERT, REFERENCES, SELECT, UPDATE, ON COMMIT REFRESH, QUERY REWRITE, READ, DEBUG, FLASHBACK ON STUDENT4.LOGS TO STUDENT3
 /
 CREATE TABLE STUDENT4.ORDERS
 (
@@ -368,7 +387,7 @@ MONITORING
 /
 
 
---  There is no statement for index STUDENT4.SYS_C0082779.
+--  There is no statement for index STUDENT4.SYS_C0084023.
 --  The object is created when the parent object is created.
 
 CREATE OR REPLACE TRIGGER STUDENT4.ORDERS_ID_TRG
@@ -436,7 +455,7 @@ MONITORING
 /
 
 
---  There is no statement for index STUDENT4.SYS_C0082780.
+--  There is no statement for index STUDENT4.SYS_C0084028.
 --  The object is created when the parent object is created.
 
 CREATE OR REPLACE TRIGGER STUDENT4.REMNANTS_ID_TRG
@@ -507,7 +526,7 @@ MONITORING
 /
 
 
---  There is no statement for index STUDENT4.SYS_C0082775.
+--  There is no statement for index STUDENT4.SYS_C0084032.
 --  The object is created when the parent object is created.
 
 CREATE OR REPLACE TRIGGER STUDENT4.THINGS_ID_TRG
@@ -567,7 +586,7 @@ MONITORING
 /
 
 
---  There is no statement for index STUDENT4.SYS_C0082776.
+--  There is no statement for index STUDENT4.SYS_C0084036.
 --  The object is created when the parent object is created.
 
 CREATE OR REPLACE TRIGGER STUDENT4.USERS_ID_TRG
@@ -627,7 +646,7 @@ MONITORING
 /
 
 
---  There is no statement for index STUDENT4.SYS_C0082777.
+--  There is no statement for index STUDENT4.SYS_C0084039.
 --  The object is created when the parent object is created.
 
 CREATE OR REPLACE TRIGGER STUDENT4.WAREHOUSES_ID_TRG

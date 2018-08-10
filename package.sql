@@ -34,6 +34,10 @@ AS
         RETURN SYS_REFCURSOR;
 END Reports_3_4;
 /
+
+
+GRANT EXECUTE ON STUDENT4.REPORTS_3_4 TO JKH
+/
 CREATE OR REPLACE PACKAGE STUDENT4.THING_3_1
 IS
     FUNCTION "GET_THING_3_1_1" (p_message OUT VARCHAR2, p_status OUT NUMBER)
@@ -64,6 +68,10 @@ IS
                                    p_message      OUT VARCHAR2)
         RETURN NUMBER;
 END;
+/
+
+
+GRANT EXECUTE ON STUDENT4.THING_3_1 TO JKH
 /
 CREATE OR REPLACE PACKAGE STUDENT4.USERS_3_2
 AS
@@ -101,7 +109,7 @@ AS
         p_ADRESS       IN     VARCHAR2 DEFAULT NULL,
         p_TELEFON      IN     VARCHAR2 DEFAULT NULL,
         p_ID_ORDER     IN     NUMBER,
-        p_CITY         IN     NUMBER,
+        p_CITY         IN     NUMBER DEFAULT NULL,
         p_message         OUT VARCHAR2)
         RETURN NUMBER;
 
@@ -126,12 +134,19 @@ AS
                               p_message        OUT VARCHAR2)
         RETURN NUMBER;
 
-    FUNCTION DEL_ORDER_3_2_7 (p_order              NUMBER,
-                              p_status_order       VARCHAR2,
-                              p_del_user           VARCHAR2,
-                              p_message        OUT VARCHAR2)
+    FUNCTION DEL_ORDER_3_2_7 (p_order          NUMBER,
+                              p_del_user       VARCHAR2,
+                              p_message    OUT VARCHAR2)
+        RETURN NUMBER;
+    FUNCTION add_user (p_NAME       IN     VARCHAR2,
+                       p_PASSWORD   IN     VARCHAR2,
+                       p_message       OUT VARCHAR2)
         RETURN NUMBER;
 END;
+/
+
+
+GRANT EXECUTE ON STUDENT4.USERS_3_2 TO JKH
 /
 CREATE OR REPLACE PACKAGE STUDENT4.WAREHOUSE_3_3
 AS
@@ -152,4 +167,8 @@ AS
                                                                        )
         RETURN NUMBER;    
 END WAREHOUSE_3_3;
+/
+
+
+GRANT EXECUTE ON STUDENT4.WAREHOUSE_3_3 TO JKH
 /

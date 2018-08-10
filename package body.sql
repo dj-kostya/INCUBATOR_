@@ -118,7 +118,7 @@ AS
             apex_json.write ('id_warehouse', i.id_warehouse);
             apex_json.write ('adress_warehouse', v_adress);
             apex_json.write ('city_warehouse', v_city);
-            apex_json.open_array ('ORDERS');
+            apex_json.open_array ('orders');
 
             FOR j
                 IN (SELECT DISTINCT o.ID_ORDER,
@@ -143,14 +143,14 @@ AS
                            AND c.id_warehouse = i.id_warehouse)
             LOOP
                 apex_json.open_object ();
-                apex_json.write ('ORDER', j.ID_ORDER);
-                apex_json.write ('CITY', j.NAME_CITY);
-                apex_json.write ('ADRESS', j.ADRESS_CUSTOMER);
-                apex_json.write ('SURNAME', j.SURNAME_CUSTOMER);
-                apex_json.write ('NAME', j.NAME_CUSTOMER);
-                apex_json.write ('PATRONYMIC', j.PATRONYMIC_CUSTOMER);
-                apex_json.write ('TELEFON', j.TELEFON_CUSTOMER);
-                apex_json.open_array ('ORDER');
+                apex_json.write ('id_order', j.ID_ORDER);
+                apex_json.write ('city', j.NAME_CITY);
+                apex_json.write ('asdress', j.ADRESS_CUSTOMER);
+                apex_json.write ('surname', j.SURNAME_CUSTOMER);
+                apex_json.write ('name', j.NAME_CUSTOMER);
+                apex_json.write ('patronymic', j.PATRONYMIC_CUSTOMER);
+                apex_json.write ('telefon', j.TELEFON_CUSTOMER);
+                apex_json.open_array ('order');
 
                 FOR f
                     IN (SELECT c.id_thing, t.NAME_THING
@@ -170,8 +170,8 @@ AS
                                AND o.ID_ORDER = j.id_order)
                 LOOP
                     apex_json.open_object ();
-                    apex_json.write ('ID_THING', f.id_thing);
-                    apex_json.write ('NAME_THING', f.NAME_THING);
+                    apex_json.write ('id_thing', f.id_thing);
+                    apex_json.write ('name_thing', f.NAME_THING);
                     apex_json.close_object ();
                 END LOOP;
 
@@ -264,7 +264,7 @@ AS
         apex_json.free_output;
         apex_json.initialize_clob_output;
         apex_json.open_object ();
-        apex_json.open_array ('THINGS');
+        apex_json.open_array ('things');
 
         FOR i
             IN (SELECT DISTINCT t.id_thing, t.NAME_THING, t.PRICE_THING
@@ -275,9 +275,9 @@ AS
                        AND r.QUANTITY < p_quantity)
         LOOP
             apex_json.open_object ();
-            apex_json.write ('NAME', i.NAME_THING);
-            apex_json.write ('PRICE', i.PRICE_THING);
-            apex_json.open_array ('QUANTITY');
+            apex_json.write ('name', i.NAME_THING);
+            apex_json.write ('price', i.PRICE_THING);
+            apex_json.open_array ('quantity');
 
             FOR j
                 IN (SELECT r.QUANTITY, w.ADRESS_WAREHOUSE, c.NAME_CITY
@@ -292,9 +292,9 @@ AS
                            AND r.QUANTITY < p_quantity)
             LOOP
                 apex_json.open_object ();
-                apex_json.write ('CITY', j.NAME_CITY);
-                apex_json.write ('ADRESS', j.ADRESS_WAREHOUSE);
-                apex_json.write ('QUANTITY', j.QUANTITY);
+                apex_json.write ('city', j.NAME_CITY);
+                apex_json.write ('adress', j.ADRESS_WAREHOUSE);
+                apex_json.write ('quantity', j.QUANTITY);
                 apex_json.close_object ();
             END LOOP;
 
@@ -366,6 +366,10 @@ AS
             RETURN NULL;
     END get_quantity_3_4_2;
 END Reports_3_4;
+/
+
+
+GRANT EXECUTE ON STUDENT4.REPORTS_3_4 TO JKH
 /
 CREATE OR REPLACE PACKAGE BODY STUDENT4.THING_3_1
 AS
@@ -453,16 +457,16 @@ AS
         apex_json.free_output;
         apex_json.initialize_clob_output;
         apex_json.open_object ();
-        apex_json.open_array ('THINGS');
+        apex_json.open_array ('things');
 
         FOR i IN (SELECT id_thing, NAME_THING, PRICE_THING
                     FROM student4.THINGS
                    WHERE DEL_DATE IS NULL)
         LOOP
             apex_json.open_object ();
-            apex_json.write ('Id', i.id_thing);
-            apex_json.write ('NAME', i.NAME_THING);
-            apex_json.write ('PRICE', i.PRICE_THING);
+            apex_json.write ('id', i.id_thing);
+            apex_json.write ('name', i.NAME_THING);
+            apex_json.write ('price', i.PRICE_THING);
             v_sum_quantity := 0;
 
             SELECT SUM (quantity)
@@ -470,7 +474,7 @@ AS
               FROM student4.remnants
              WHERE i.id_thing = id_thing AND DEL_DATE IS NULL;
 
-            apex_json.write ('Quantity', NVL (v_sum_quantity, 0));
+            apex_json.write ('quantity', NVL (v_sum_quantity, 0));
             apex_json.close_object ();
         END LOOP;
 
@@ -571,9 +575,6 @@ AS
             RETURN 0;
         ELSE
             p_message := 'Все записи удалены';
-            STUDENT4.add_logs  (
-                P_FUNCTION   => 'STUDENT4.THING_3_1.EDIT_THING_3_1_3',
-                P_TEXT_ERR   => TO_CHAR (SQLCODE) || ' - ' || SQLERRM);
             RETURN 1;
         END IF;
     EXCEPTION
@@ -604,8 +605,8 @@ AS
           FROM student4.THINGS
          WHERE ID_THING = p_ID AND DEL_DATE IS NULL;
 
-        /*IF v_id_count > 0
-        THEN*/
+        IF v_id_count > 0
+        THEN
         v_date := SYSDATE;
         v_del_user :=
             CASE WHEN p_who_del IS NOT NULL THEN p_who_del ELSE 'UNKNOWN' END;
@@ -624,10 +625,10 @@ AS
 
         p_message := 'ВСЕ ГУД';
         RETURN 0;
-    /*ELSE
-        p_message := 'Данный товар уже удален';
+    ELSE
+        p_message := 'Данный товар не существует';
         RETURN 1;
-    END IF;*/
+    END IF;
     EXCEPTION
         WHEN OTHERS
         THEN
@@ -642,6 +643,10 @@ AS
             RETURN 2;
     END;
 END;
+/
+
+
+GRANT EXECUTE ON STUDENT4.THING_3_1 TO JKH
 /
 CREATE OR REPLACE PACKAGE BODY STUDENT4.USERS_3_2
 AS
@@ -691,7 +696,6 @@ AS
     AS
         COU_USER   NUMBER;
     BEGIN
-        
         UPDATE student4.USERS
            SET NAME_USER = p_NEW_NAME, PASS_USER = p_NEW_PASS
          WHERE id_user = p_ID AND DEl_date IS NULL;
@@ -704,7 +708,6 @@ AS
             p_message := 'Пользователь удален';
             RETURN 1;
         END IF;
-    
     EXCEPTION
         WHEN OTHERS
         THEN
@@ -850,14 +853,14 @@ AS
         v_date := SYSDATE;
         v_who_del := P_WHO_DEL;
 
-        
-        
 
 
         SELECT COUNT (ID_LINE)
           INTO v_count_thing
           FROM student4.carts
-         WHERE ID_ORDER = P_ORDER_ AND DEL_DATE IS NULL AND id_thing != p_thing;
+         WHERE     ID_ORDER = P_ORDER_
+               AND DEL_DATE IS NULL
+               AND id_thing != p_thing;
 
         IF v_count_thing = 0
         THEN
@@ -869,20 +872,21 @@ AS
                SET DEL_DATE = v_date, DEL_USER = 'auto'
              WHERE ID_ORDER = P_order_ AND del_date IS NULL;
         END IF;
+
         UPDATE student4.CARTS
            SET DEL_DATE = v_date, DEL_USER = v_who_del
          WHERE     ID_ORDER = P_order_
                AND id_thing = p_thing
                AND DEL_DATE IS NULL;
+
         IF SQL%ROWCOUNT = 1
         THEN
             p_message := 'ВСЕ ГУД ';
             RETURN 0;
         ELSE
-            p_message := 'Товар уже удален из корзины';
+            p_message := 'Товар отсутсвует в корзины';
             RETURN 1;
         END IF;
-        
     EXCEPTION
         WHEN OTHERS
         THEN
@@ -914,10 +918,11 @@ AS
         v_id_us         NUMBER;
         v_id_us_count   NUMBER;
     BEGIN
-        SELECT COUNT (ID_ORDER), ID_USER          -- существует ли такой заказ
-          INTO v_id_ord_cou, v_id_us
-          FROM student4.ORDERS
-         WHERE student4.ORDERS.ID_ORDER = p_ID_ORDER;
+          SELECT COUNT (ID_ORDER), ID_USER        -- существует ли такой заказ
+            INTO v_id_ord_cou, v_id_us
+            FROM student4.ORDERS
+           WHERE student4.ORDERS.ID_ORDER = p_ID_ORDER
+        GROUP BY ID_USER;
 
         IF v_id_ord_cou > 0
         THEN
@@ -1111,6 +1116,7 @@ AS
     EXCEPTION
         WHEN NO_DATA_FOUND
         THEN
+            p_message:='Заказы не найдены';
             p_status := 1;
             RETURN NULL;
         WHEN OTHERS
@@ -1197,10 +1203,9 @@ AS
             RETURN 1;
     END;
 
-    FUNCTION DEL_ORDER_3_2_7 (p_order              NUMBER,
-                              p_status_order       VARCHAR2,
-                              p_del_user           VARCHAR2,
-                              p_message        OUT VARCHAR2)
+    FUNCTION DEL_ORDER_3_2_7 (p_order          NUMBER,
+                              p_del_user       VARCHAR2,
+                              p_message    OUT VARCHAR2)
         RETURN NUMBER
     AS
     BEGIN
@@ -1237,7 +1242,49 @@ AS
                 P_TEXT_ERR   => TO_CHAR (SQLCODE) || ' - ' || SQLERRM);
             RETURN 1;
     END;
+
+    FUNCTION add_user (p_NAME       IN     VARCHAR2,
+                       p_PASSWORD   IN     VARCHAR2,
+                       p_message       OUT VARCHAR2)
+        RETURN NUMBER
+    IS
+        v_cou_users   NUMBER;
+    BEGIN
+        SELECT COUNT (*)
+          INTO v_cou_users
+          FROM student4.USERS
+         WHERE p_NAME = NAME_USER AND Del_date IS NULL;
+
+        IF v_cou_users = 0
+        THEN
+            INSERT INTO student4.USERS ("NAME_USER", "PASS_USER")
+                 VALUES (p_NAME, p_PASSWORD);
+
+            p_message := 'Все гуд';
+            RETURN 0;
+        ELSE
+            p_message :=
+                'Имя пользователя уже занято';
+            RETURN 1;
+        END IF;
+    EXCEPTION
+        WHEN OTHERS
+        THEN
+            p_message :=
+                   'Все сломалось сорри ( : '
+                || TO_CHAR (SQLCODE)
+                || ' - '
+                || SQLERRM;
+            STUDENT4.add_logs (
+                P_FUNCTION   => 'STUDENT4.USERS_3_2.add_user',
+                P_TEXT_ERR   => TO_CHAR (SQLCODE) || ' - ' || SQLERRM);
+            RETURN 2;
+    END;
 END;
+/
+
+
+GRANT EXECUTE ON STUDENT4.USERS_3_2 TO JKH
 /
 CREATE OR REPLACE PACKAGE BODY STUDENT4.WAREHOUSE_3_3
 AS
@@ -1248,7 +1295,15 @@ AS
     IS
         v_count_city   NUMBER;
     BEGIN
-        INSERT INTO student4.WAREHOUSES (ADRESS_WAREHOUSE, CITY_WAREHOUSE)
+        MERGE INTO student4.WAREHOUSES w
+             USING DUAL
+                ON (w.CITY_WAREHOUSE = p_city and w.ADRESS_WAREHOUSE = p_adress )
+        WHEN MATCHED
+        THEN
+            UPDATE SET w.del_date = null 
+        WHEN NOT MATCHED
+        THEN
+        INSERT (ADRESS_WAREHOUSE, CITY_WAREHOUSE)
              VALUES (p_adress, p_city);
 
         p_message := 'ВСЕ ГУД!';
@@ -1292,11 +1347,14 @@ AS
             
             p_message := 'ВСЕ ГУД!';
             RETURN 0;
-        ELSE
+        ELSIF v_quantity is null then
+        p_message := 'Склад уже удален';
+            RETURN 1;
+        else
             p_message :=
-                   'На складе осталось еще  '
-                || v_quantity
-                || 'товаров';
+                   'На складе осталось еще '
+                || to_char(v_quantity)
+                || ' товаров';
             RETURN 2;
         END IF;
     EXCEPTION
@@ -1363,6 +1421,10 @@ AS
             RETURN 0;
         END IF;
     EXCEPTION
+            WHEN NO_DATA_FOUND
+        THEN
+            p_message := 'Один из складов удален';
+            RETURN 3;
         WHEN OTHERS
         THEN
             p_message :=
@@ -1378,4 +1440,35 @@ AS
             RETURN 2;
     END TRANS_FROM_WAREHOUSE_3_3_3;
 END WAREHOUSE_3_3;
+/
+
+
+GRANT EXECUTE ON STUDENT4.WAREHOUSE_3_3 TO JKH
+/
+CREATE OR REPLACE PACKAGE BODY STUDENT4.CITY_pac
+AS
+    FUNCTION add_city (
+    p_nameCity VARCHAR2,
+    p_message VARCHAR2
+    )
+        RETURN NUMBER
+    IS
+    BEGIN
+        INSERT into STUDENT4.CITY  (STUDENT4.CITY.NAME_CITY) values( p_nameCity);
+                
+        p_message:='Все гуд';
+        return 0;
+        EXCEPTION
+        WHEN OTHERS
+        THEN
+            p_message :=
+                   'Все сломалось сорри ( : '
+                || TO_CHAR (SQLCODE)
+                || ' - '
+                || SQLERRM;
+            STUDENT4.add_logs  (P_FUNCTION   => 'student4.CITY_pac.add_city',
+                      P_TEXT_ERR   => TO_CHAR (SQLCODE) || ' - ' || SQLERRM);
+            RETURN 1;
+    END;
+END ;
 /
